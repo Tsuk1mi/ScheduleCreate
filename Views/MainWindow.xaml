@@ -1,0 +1,126 @@
+<Window x:Class="ScheduleCreate.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewmodels="clr-namespace:ScheduleCreate.ViewModels"
+        Title="Расписание занятий" Height="720" Width="1280"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.DataContext>
+        <viewmodels:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя панель инструментов -->
+        <ToolBar Grid.Row="0" Margin="0,0,0,10">
+            <Button Content="Добавить" Command="{Binding AddScheduleEntryCommand}" 
+                    Width="100" Margin="0,0,10,0"/>
+            <Button Content="Изменить" Command="{Binding EditScheduleEntryCommand}" 
+                    Width="100" Margin="0,0,10,0"/>
+            <Button Content="Удалить" Command="{Binding DeleteScheduleEntryCommand}" 
+                    Width="100" Margin="0,0,10,0"/>
+            <Separator/>
+            <Button Content="Управление преподавателями" Command="{Binding ManageTeachersCommand}" 
+                    Width="120"/>
+            <Button Content="Управление группами" Command="{Binding ManageGroupsCommand}" Margin="5"/>
+            <Button Content="Управление аудиториями" Command="{Binding ManageAuditoriumsCommand}" Margin="5"/>
+            <Separator/>
+            <Button Content="Статистика" Command="{Binding ShowStatisticsCommand}" Margin="5"/>
+            <Separator/>
+            <Button Content="Экспорт" Command="{Binding ExportCommand}" Margin="5"/>
+            <Button Content="Импорт" Command="{Binding ImportCommand}" Margin="5"/>
+        </ToolBar>
+
+        <!-- Панель поиска -->
+        <Grid Grid.Row="1" Margin="10,0,10,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0" 
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,0,10,0">
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Style.Resources>
+                            <VisualBrush x:Key="SearchBrush" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
+                                <VisualBrush.Visual>
+                                    <TextBlock Text="Поиск..." FontStyle="Italic"/>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Style.Resources>
+                        <Style.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter Property="Background" Value="{StaticResource SearchBrush}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+
+            <Button Grid.Column="1" Content="Очистить" 
+                    Command="{Binding ClearSearchCommand}"
+                    Width="100"/>
+        </Grid>
+
+        <!-- Основная область с расписанием -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Левая панель с фильтрами -->
+            <StackPanel Grid.Column="0" Margin="10">
+                <GroupBox Header="Фильтры" Margin="0,0,0,10">
+                    <StackPanel Margin="5">
+                        <TextBlock Text="Группа:" Margin="0,5"/>
+                        <ComboBox ItemsSource="{Binding Groups}"
+                                  SelectedItem="{Binding SelectedGroup}"
+                                  DisplayMemberPath="Name"
+                                  Margin="0,5"/>
+                        
+                        <TextBlock Text="Преподаватель:" Margin="0,5"/>
+                        <ComboBox ItemsSource="{Binding Teachers}"
+                                  SelectedItem="{Binding SelectedTeacher}"
+                                  DisplayMemberPath="FullName"
+                                  Margin="0,5"/>
+                        
+                        <TextBlock Text="Аудитория:" Margin="0,5"/>
+                        <ComboBox ItemsSource="{Binding Auditoriums}"
+                                  SelectedItem="{Binding SelectedAuditorium}"
+                                  DisplayMemberPath="Number"
+                                  Margin="0,5"/>
+                        
+                        <TextBlock Text="Период:" Margin="0,5"/>
+                        <DatePicker SelectedDate="{Binding StartDate}" Margin="0,5"/>
+                        <DatePicker SelectedDate="{Binding EndDate}" Margin="0,5"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+
+            <!-- Основная таблица расписания -->
+            <DataGrid Grid.Column="1" 
+                      Margin="10" 
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding FilteredScheduleEntries}"
+                      SelectedItem="{Binding SelectedScheduleEntry}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Дата" Width="100" Binding="{Binding Date, StringFormat=d}"/>
+                    <DataGridTextColumn Header="Время" Width="100" Binding="{Binding StartTime, StringFormat=hh\\:mm}"/>
+                    <DataGridTextColumn Header="Дисциплина" Width="200" Binding="{Binding Discipline.Name}"/>
+                    <DataGridTextColumn Header="Преподаватель" Width="200" Binding="{Binding Teacher.FullName}"/>
+                    <DataGridTextColumn Header="Группа" Width="100" Binding="{Binding Groups[0].Name}"/>
+                    <DataGridTextColumn Header="Аудитория" Width="100" Binding="{Binding Auditorium.Number}"/>
+                    <DataGridTextColumn Header="Тип" Width="100" Binding="{Binding Type}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</Window> 

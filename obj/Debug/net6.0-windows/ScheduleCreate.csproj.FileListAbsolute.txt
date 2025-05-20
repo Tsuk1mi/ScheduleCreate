@@ -1,0 +1,15 @@
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\ScheduleCreate.csproj.AssemblyReference.cache
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\StatisticsWindow.baml
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\AuditoriumEditWindow.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\AuditoriumManagementWindow.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\GroupEditWindow.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\GroupManagementWindow.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\MainWindow.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\StatisticsWindow.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\TeacherEditWindow.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\TeacherManagementWindow.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\ScheduleCreate_MarkupCompile.cache
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\ScheduleCreate_MarkupCompile.lref
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\App.g.cs
+C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\obj\Debug\net6.0-windows\Views\ScheduleEntryWindow.g.cs
