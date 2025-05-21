@@ -20,59 +20,33 @@ namespace ScheduleCreate.Services
         public async Task<IEnumerable<TeacherLoadStatistics>> GetTeacherLoadStatisticsAsync(DateTime startDate, DateTime endDate)
         {
             var scheduleEntries = await _context.ScheduleEntries
-                .Include(s => s.Teacher)
-                .Where(s => s.Date >= startDate && s.Date <= endDate && s.Teacher != null)
+                .Where(e => e.Date >= startDate && e.Date <= endDate)
                 .ToListAsync();
+                
+            var teachers = await _context.Teachers.ToListAsync();
 
-            return scheduleEntries
-                .GroupBy(s => s.Teacher)
-                .Select(g => new TeacherLoadStatistics
-                {
-                    TeacherName = g.Key?.FullName ?? "Неизвестный преподаватель",
-                    TotalHours = (int)Math.Round(g.Sum(s => (s.EndTime - s.StartTime).TotalHours))
-                })
-                .OrderByDescending(s => s.TotalHours);
+            return teachers.Select(teacher => new TeacherLoadStatistics
+            {
+                TeacherName = teacher.Name,
+                TotalHours = scheduleEntries.Count(e => e.TeacherId == teacher.Id) * 2 // Каждое занятие по 2 часа
+            });
         }
 
         public async Task<IEnumerable<AuditoriumLoadStatistics>> GetAuditoriumLoadStatisticsAsync(DateTime startDate, DateTime endDate)
         {
             var scheduleEntries = await _context.ScheduleEntries
-                .Include(s => s.Auditorium)
-                .Where(s => s.Date >= startDate && s.Date <= endDate && s.Auditorium != null)
+                .Where(e => e.Date >= startDate && e.Date <= endDate)
                 .ToListAsync();
+                
+            var auditoriums = await _context.Auditoriums.ToListAsync();
+            var totalPossibleHoursPerWeek = 60; // Примерное количество часов в неделю
 
-            return scheduleEntries
-                .GroupBy(s => s.Auditorium)
-                .Select(g => new AuditoriumLoadStatistics
-                {
-                    AuditoriumNumber = g.Key?.Number ?? "Неизвестная аудитория",
-                    TotalHours = (int)Math.Round(g.Sum(s => (s.EndTime - s.StartTime).TotalHours)),
-                    UsagePercent = CalculateUsagePercent(g.Sum(s => (s.EndTime - s.StartTime).TotalHours), startDate, endDate)
-                })
-                .OrderByDescending(s => s.TotalHours);
-        }
-
-        private static double CalculateUsagePercent(double totalHours, DateTime startDate, DateTime endDate)
-        {
-            var workingDays = CountWorkingDays(startDate, endDate);
-            var totalPossibleHours = workingDays * 12.0; // Предполагаем 12-часовой рабочий день
-            return (totalHours / totalPossibleHours) * 100;
-        }
-
-        private static int CountWorkingDays(DateTime startDate, DateTime endDate)
-        {
-            var days = 0;
-            var current = startDate.Date;
-            while (current <= endDate.Date)
+            return auditoriums.Select(auditorium => new AuditoriumLoadStatistics
             {
-                if (current.DayOfWeek != DayOfWeek.Saturday && current.DayOfWeek != DayOfWeek.Sunday)
-                {
-                    days++;
-                }
-                current = current.AddDays(1);
-            }
-            return days;
+                AuditoriumNumber = auditorium.Number,
+                TotalHours = scheduleEntries.Count(e => e.AuditoriumId == auditorium.Id) * 2,
+                UsagePercent = (scheduleEntries.Count(e => e.AuditoriumId == auditorium.Id) * 2.0 / totalPossibleHoursPerWeek) * 100
+            });
         }
     }
 }
-
