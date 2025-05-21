@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 C:\Users\max22\OneDrive\Desktop\cursor\ScheduleCreate\App.xaml
-9669905690
+10-1996727484
 
-40314537883
-234-1072895434
-Views\AuditoriumEditWindow.xaml;Views\AuditoriumManagementWindow.xaml;Views\GroupEditWindow.xaml;Views\GroupManagementWindow.xaml;Views\MainWindow.xaml;Views\ScheduleEntryWindow.xaml;Views\StatisticsWindow.xaml;Views\TeacherEditWindow.xaml;Views\TeacherManagementWindow.xaml;
+45442566060
+239-381308581
+Styles\DarkTheme.xaml;Views\AuditoriumEditWindow.xaml;Views\AuditoriumManagementWindow.xaml;Views\GroupEditWindow.xaml;Views\GroupManagementWindow.xaml;Views\MainWindow.xaml;Views\ScheduleEntryWindow.xaml;Views\StatisticsWindow.xaml;Views\TeacherEditWindow.xaml;Views\TeacherManagementWindow.xaml;
 
 True
 

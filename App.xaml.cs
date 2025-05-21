@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ScheduleCreate.Data;
 using ScheduleCreate.Services;
+using ScheduleCreate.Views;
+using ScheduleCreate.ViewModels;
+using System.Threading.Tasks;
 
 namespace ScheduleCreate
 {
@@ -17,29 +20,42 @@ namespace ScheduleCreate
             serviceProvider = services.BuildServiceProvider();
         }
 
-        private void ConfigureServices(ServiceCollection services)
+        private void ConfigureServices(IServiceCollection services)
         {
-            // Регистрация контекста базы данных
+            // Регистрация DbContext с использованием SQLite
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=ScheduleCreate;Trusted_Connection=True;"));
+                options.UseSqlite("Data Source=ScheduleCreate.db")
+            );
+
+            // Регистрация сервиса инициализации БД
+            services.AddTransient<DbInitializerService>();
 
             // Регистрация сервисов
-            services.AddScoped<IScheduleService, ScheduleService>();
-            services.AddScoped<ITeacherService, TeacherService>();
+            services.AddTransient<ITeacherService, TeacherService>();
+            services.AddTransient<IGroupService, GroupService>();
+            services.AddTransient<IAuditoriumService, AuditoriumService>();
+            services.AddTransient<IScheduleService, ScheduleService>();
+            services.AddTransient<IScheduleExportService, ScheduleExportService>();
+            services.AddTransient<IStatisticsService, StatisticsService>();
 
-            // Регистрация окон
-            services.AddTransient<Views.MainWindow>();
+            // Регистрация ViewModels
+            services.AddTransient<MainViewModel>();
+            services.AddTransient<MainWindow>();
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            var mainWindow = serviceProvider.GetService<Views.MainWindow>();
-            if (mainWindow != null)
+            // Инициализируем базу данных
+            using (var scope = serviceProvider.CreateScope())
             {
-                mainWindow.Show();
+                var dbInitializer = scope.ServiceProvider.GetRequiredService<DbInitializerService>();
+                await dbInitializer.InitializeAsync();
             }
+
+            var mainWindow = serviceProvider.GetService<MainWindow>();
+            mainWindow?.Show();
         }
     }
-} 
+}

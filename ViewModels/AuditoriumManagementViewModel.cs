@@ -14,9 +14,9 @@ namespace ScheduleCreate.ViewModels
     {
         private readonly IAuditoriumService _auditoriumService;
         private ObservableCollection<Auditorium> _auditoriums;
-        private Auditorium _selectedAuditorium;
-        private string _errorMessage;
-        private Window _window;
+        private Auditorium _selectedAuditorium = null!;
+        private string _errorMessage = string.Empty;
+        private Window? _window = null;
 
         public AuditoriumManagementViewModel(IAuditoriumService auditoriumService)
         {
@@ -30,7 +30,7 @@ namespace ScheduleCreate.ViewModels
             CloseCommand = new RelayCommand(_ => Close());
 
             // Загрузка данных
-            LoadDataAsync().ConfigureAwait(false);
+            LoadDataAsyncSafe();
         }
 
         public void SetWindow(Window window)
@@ -78,6 +78,11 @@ namespace ScheduleCreate.ViewModels
             }
         }
 
+        private async void LoadDataAsyncSafe()
+        {
+            await LoadDataAsync();
+        }
+
         private void AddAuditorium()
         {
             var viewModel = new AuditoriumEditViewModel(_auditoriumService);
@@ -88,7 +93,7 @@ namespace ScheduleCreate.ViewModels
 
             if (window.ShowDialog() == true)
             {
-                LoadDataAsync().ConfigureAwait(false);
+                LoadDataAsyncSafe();
             }
         }
 
@@ -104,7 +109,7 @@ namespace ScheduleCreate.ViewModels
 
                 if (window.ShowDialog() == true)
                 {
-                    LoadDataAsync().ConfigureAwait(false);
+                    LoadDataAsyncSafe();
                 }
             }
         }
@@ -127,8 +132,11 @@ namespace ScheduleCreate.ViewModels
 
         private void Close()
         {
-            _window.DialogResult = true;
-            _window.Close();
+            if (_window != null)
+            {
+                _window.DialogResult = true;
+                _window.Close();
+            }
         }
     }
-} 
+}

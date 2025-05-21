@@ -21,14 +21,19 @@ namespace ScheduleCreate.Services
             return await _context.Teachers
                 .Include(t => t.Disciplines)
                 .OrderBy(t => t.FullName)
-                .ToListAsync();
+                .ToListAsync() ?? new List<Teacher>();
         }
 
         public async Task<Teacher> GetTeacherByIdAsync(int id)
         {
-            return await _context.Teachers
+            var teacher = await _context.Teachers
                 .Include(t => t.Disciplines)
                 .FirstOrDefaultAsync(t => t.Id == id);
+            
+            if (teacher == null)
+                throw new KeyNotFoundException($"Преподаватель с ID {id} не найден");
+                
+            return teacher;
         }
 
         public async Task<Teacher> AddTeacherAsync(Teacher teacher)
@@ -40,25 +45,19 @@ namespace ScheduleCreate.Services
 
         public async Task<Teacher> UpdateTeacherAsync(Teacher teacher)
         {
-            var existingTeacher = await _context.Teachers.FindAsync(teacher.Id);
-            if (existingTeacher == null)
-            {
-                throw new KeyNotFoundException("Преподаватель не найден");
-            }
-
+            var existingTeacher = await _context.Teachers.FindAsync(teacher.Id) 
+                ?? throw new KeyNotFoundException($"Преподаватель с ID {teacher.Id} не найден");
+            
             _context.Entry(existingTeacher).CurrentValues.SetValues(teacher);
             await _context.SaveChangesAsync();
-            return teacher;
+            return existingTeacher;
         }
 
         public async Task DeleteTeacherAsync(int id)
         {
-            var teacher = await _context.Teachers.FindAsync(id);
-            if (teacher == null)
-            {
-                throw new KeyNotFoundException("Преподаватель не найден");
-            }
-
+            var teacher = await _context.Teachers.FindAsync(id)
+                ?? throw new KeyNotFoundException($"Преподаватель с ID {id} не найден");
+            
             _context.Teachers.Remove(teacher);
             await _context.SaveChangesAsync();
         }
@@ -112,4 +111,5 @@ namespace ScheduleCreate.Services
             }
         }
     }
-} 
+}
+

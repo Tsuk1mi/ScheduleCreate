@@ -2,29 +2,18 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:ScheduleCreate.Converters"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             StartupUri="Views/MainWindow.xaml">
+             xmlns:system="clr-namespace:System;assembly=System.Runtime">
     <Application.Resources>
         <ResourceDictionary>
-            <converters:BoolToTitleConverter x:Key="BoolToTitleConverter"/>
-            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
-            <x:Array x:Key="ScheduleEntryTypeValues" Type="{x:Type system:String}">
-                <system:String>Лекция</system:String>
-                <system:String>Практика</system:String>
-                <system:String>Лабораторная работа</system:String>
-                <system:String>Семинар</system:String>
-            </x:Array>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Здесь будут стили и темы -->
+                <ResourceDictionary Source="/Styles/DarkTheme.xaml"/>
                 <ResourceDictionary>
-                    <!-- Color Palette -->
-                    <SolidColorBrush x:Key="PrimaryColor" Color="#4CAF50"/> <!-- Green -->
-                    <SolidColorBrush x:Key="AccentColor" Color="#FF9800"/> <!-- Orange -->
+                    <SolidColorBrush x:Key="PrimaryColor" Color="#4CAF50"/>
+                    <SolidColorBrush x:Key="AccentColor" Color="#FF9800"/>
                     <SolidColorBrush x:Key="TextColor" Color="#333333"/>
                     <SolidColorBrush x:Key="BackgroundColor" Color="#F5F5F5"/>
                     <SolidColorBrush x:Key="ErrorColor" Color="Red"/>
 
-                    <!-- Typography Styles -->
                     <Style TargetType="TextBlock">
                         <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
                     </Style>
@@ -32,7 +21,6 @@
                          <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
                     </Style>
 
-                    <!-- Base Control Styles -->
                     <Style TargetType="Button">
                         <Setter Property="Padding" Value="10,5"/>
                         <Setter Property="Margin" Value="2"/>
@@ -84,6 +72,16 @@
                      </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            
+            <converters:BoolToTitleConverter x:Key="BoolToTitleConverter"/>
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+            
+            <x:Array x:Key="ScheduleEntryTypeValues" Type="{x:Type system:String}">
+                <system:String>Лекция</system:String>
+                <system:String>Практика</system:String>
+                <system:String>Лабораторная</system:String>
+                <system:String>Экзамен</system:String>
+            </x:Array>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

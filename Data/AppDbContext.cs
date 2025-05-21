@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using ScheduleCreate.Models;
 
 namespace ScheduleCreate.Data
@@ -8,6 +9,7 @@ namespace ScheduleCreate.Data
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
+            Database.EnsureCreated(); // Автоматически создаем базу данных при первом обращении
         }
 
         public DbSet<Teacher> Teachers { get; set; } = null!;
@@ -46,4 +48,16 @@ namespace ScheduleCreate.Data
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
-} 
+
+    public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+    {
+        public AppDbContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlite("Data Source=ScheduleCreate.db");
+
+            return new AppDbContext(optionsBuilder.Options);
+        }
+    }
+}
+

@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using ScheduleCreate.Models;
+using ScheduleCreate.Models;  // Явное указание на пространство имен моделей
 using ScheduleCreate.Services;
 using ScheduleCreate.Commands;
 
@@ -12,12 +12,12 @@ namespace ScheduleCreate.ViewModels
     public class StatisticsViewModel : ViewModelBase
     {
         private readonly IStatisticsService _statisticsService;
-        private DateTime _startDate;
-        private DateTime _endDate;
-        private ObservableCollection<TeacherLoadStatistics> _teacherStatistics;
-        private ObservableCollection<AuditoriumLoadStatistics> _auditoriumStatistics;
-        private string _errorMessage;
-        private Window _window;
+        private DateTime _startDate = DateTime.Today;
+        private DateTime _endDate = DateTime.Today.AddDays(7);
+        private ObservableCollection<Models.TeacherLoadStatistics> _teacherStatistics = new();
+        private ObservableCollection<Models.AuditoriumLoadStatistics> _auditoriumStatistics = new();
+        private string _errorMessage = string.Empty;
+        private Window? _window;
 
         public DateTime StartDate
         {
@@ -39,7 +39,7 @@ namespace ScheduleCreate.ViewModels
             }
         }
 
-        public ObservableCollection<TeacherLoadStatistics> TeacherStatistics
+        public ObservableCollection<Models.TeacherLoadStatistics> TeacherStatistics
         {
             get => _teacherStatistics;
             set
@@ -49,7 +49,7 @@ namespace ScheduleCreate.ViewModels
             }
         }
 
-        public ObservableCollection<AuditoriumLoadStatistics> AuditoriumStatistics
+        public ObservableCollection<Models.AuditoriumLoadStatistics> AuditoriumStatistics
         {
             get => _auditoriumStatistics;
             set
@@ -74,33 +74,30 @@ namespace ScheduleCreate.ViewModels
 
         public StatisticsViewModel(IStatisticsService statisticsService)
         {
-            _statisticsService = statisticsService;
-
-            _startDate = DateTime.Today;
-            _endDate = DateTime.Today.AddDays(7);
-            _teacherStatistics = new ObservableCollection<TeacherLoadStatistics>();
-            _auditoriumStatistics = new ObservableCollection<AuditoriumLoadStatistics>();
+            _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
 
             RefreshCommand = new RelayCommand(async _ => await LoadStatisticsAsync());
             CloseCommand = new RelayCommand(_ => Close());
 
+            // Загружаем статистику при создании
             LoadStatisticsAsync().ConfigureAwait(false);
         }
 
         public void SetWindow(Window window)
         {
-            _window = window;
+            _window = window ?? throw new ArgumentNullException(nameof(window));
         }
 
         private async Task LoadStatisticsAsync()
         {
             try
             {
+                ErrorMessage = string.Empty;
                 var teacherStats = await _statisticsService.GetTeacherLoadStatisticsAsync(StartDate, EndDate);
-                TeacherStatistics = new ObservableCollection<TeacherLoadStatistics>(teacherStats);
+                TeacherStatistics = new ObservableCollection<Models.TeacherLoadStatistics>(teacherStats);
 
                 var auditoriumStats = await _statisticsService.GetAuditoriumLoadStatisticsAsync(StartDate, EndDate);
-                AuditoriumStatistics = new ObservableCollection<AuditoriumLoadStatistics>(auditoriumStats);
+                AuditoriumStatistics = new ObservableCollection<Models.AuditoriumLoadStatistics>(auditoriumStats);
             }
             catch (Exception ex)
             {
@@ -113,4 +110,5 @@ namespace ScheduleCreate.ViewModels
             _window?.Close();
         }
     }
-} 
+}
+

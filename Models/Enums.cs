@@ -2,10 +2,10 @@ namespace ScheduleCreate.Models
 {
     public enum AuditoriumType
     {
-        Lecture,
-        Lab,
-        Practice,
-        ComputerClass
+        Undefined = 0,
+        LectureHall = 1,
+        ComputerClass = 2,
+        Laboratory = 3
     }
 
     public enum LessonType
@@ -15,4 +15,5 @@ namespace ScheduleCreate.Models
         Lab,
         Consultation
     }
-} 
+}
+

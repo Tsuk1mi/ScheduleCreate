@@ -146,8 +146,8 @@ namespace ScheduleCreate.ViewModels
             }
         }
 
-        public Group SelectedGroup { get; set; }
-        public Group SelectedGroupToRemove { get; set; }
+        public Group SelectedGroup { get; set; } = null!;
+        public Group SelectedGroupToRemove { get; set; } = null!;
 
         public Auditorium? SelectedAuditorium
         {
@@ -274,15 +274,23 @@ namespace ScheduleCreate.ViewModels
         {
             try
             {
+                if (ScheduleEntry == null || ScheduleEntry.Groups == null || 
+                    ScheduleEntry.Teacher == null || ScheduleEntry.Auditorium == null)
+                {
+                    ErrorMessage = "Не все обязательные поля заполнены";
+                    return true;
+                }
+
                 // Получаем все занятия на выбранную дату
                 var schedule = _scheduleService.GetScheduleAsync(ScheduleEntry.Date, ScheduleEntry.Date).Result;
 
-                // Проверяем пересечения для каждой группы
                 foreach (var group in ScheduleEntry.Groups)
                 {
+                    if (group == null) continue;
+
                     var groupOverlaps = schedule
-                        .Where(e => e.Id != ScheduleEntry.Id && // Исключаем текущее занятие при редактировании
-                                  e.Groups.Any(g => g.Id == group.Id) && // Проверяем группы
+                        .Where(e => e.Id != ScheduleEntry.Id && 
+                                  e.Groups.Any(g => g?.Id == group.Id) && 
                                   IsTimeOverlap(e.StartTime, e.EndTime, ScheduleEntry.StartTime, ScheduleEntry.EndTime))
                         .ToList();
 
@@ -294,10 +302,9 @@ namespace ScheduleCreate.ViewModels
                     }
                 }
 
-                // Проверяем пересечения для преподавателя
                 var teacherOverlaps = schedule
-                    .Where(e => e.Id != ScheduleEntry.Id && // Исключаем текущее занятие при редактировании
-                              e.TeacherId == ScheduleEntry.TeacherId && // Проверяем преподавателя
+                    .Where(e => e.Id != ScheduleEntry.Id && 
+                              e.TeacherId == ScheduleEntry.TeacherId && 
                               IsTimeOverlap(e.StartTime, e.EndTime, ScheduleEntry.StartTime, ScheduleEntry.EndTime))
                     .ToList();
 
@@ -308,10 +315,9 @@ namespace ScheduleCreate.ViewModels
                     return true;
                 }
 
-                // Проверяем пересечения для аудитории
                 var auditoriumOverlaps = schedule
-                    .Where(e => e.Id != ScheduleEntry.Id && // Исключаем текущее занятие при редактировании
-                              e.AuditoriumId == ScheduleEntry.AuditoriumId && // Проверяем аудиторию
+                    .Where(e => e.Id != ScheduleEntry.Id && 
+                              e.AuditoriumId == ScheduleEntry.AuditoriumId && 
                               IsTimeOverlap(e.StartTime, e.EndTime, ScheduleEntry.StartTime, ScheduleEntry.EndTime))
                     .ToList();
 
@@ -349,8 +355,11 @@ namespace ScheduleCreate.ViewModels
                     await _scheduleService.AddScheduleEntryAsync(ScheduleEntry);
                 }
 
-                _window.DialogResult = true;
-                _window.Close();
+                if (_window != null)
+                {
+                    _window.DialogResult = true;
+                    _window.Close();
+                }
             }
             catch (Exception ex)
             {
@@ -360,8 +369,11 @@ namespace ScheduleCreate.ViewModels
 
         private void Cancel()
         {
-            _window.DialogResult = false;
-            _window.Close();
+            if (_window != null)
+            {
+                _window.DialogResult = false;
+                _window.Close();
+            }
         }
     }
-} 
+}

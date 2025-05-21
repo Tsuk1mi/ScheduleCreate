@@ -24,8 +24,8 @@ namespace ScheduleCreate.ViewModels
         private readonly IStatisticsService _statisticsService;
         private ObservableCollection<ScheduleEntry> _scheduleEntries;
         private ObservableCollection<ScheduleEntry> _filteredScheduleEntries;
-        private ScheduleEntry _selectedScheduleEntry;
-        private string _searchText;
+        private ScheduleEntry _selectedScheduleEntry = null!;
+        private string _searchText = string.Empty;
         private DateTime? _startDate;
         private DateTime? _endDate;
         private Teacher? _selectedTeacher;
@@ -193,28 +193,52 @@ namespace ScheduleCreate.ViewModels
             AddScheduleEntryCommand = new RelayCommand(AddScheduleEntry);
             EditScheduleEntryCommand = new RelayCommand(EditScheduleEntry, CanEditOrDelete);
             DeleteScheduleEntryCommand = new RelayCommand(async _ => await DeleteScheduleEntryAsync(), CanEditOrDelete);
-            ManageTeachersCommand = new RelayCommand(ManageTeachers);
-            ManageGroupsCommand = new RelayCommand(ManageGroups); 
-            ManageAuditoriumsCommand = new RelayCommand(ManageAuditoriums);
+            ManageTeachersCommand = new RelayCommand(async _ => await ManageTeachers());
+            ManageGroupsCommand = new RelayCommand(async _ => await ManageGroups());
+            ManageAuditoriumsCommand = new RelayCommand(async _ => await ManageAuditoriums());
             ExportCommand = new RelayCommand(async _ => await Export());
             ImportCommand = new RelayCommand(async _ => await Import());
-            ClearSearchCommand = new RelayCommand(ClearSearch);
-            ShowStatisticsCommand = new RelayCommand(ShowStatistics);
+            ClearSearchCommand = new RelayCommand(_ => ClearSearch());
+            ShowStatisticsCommand = new RelayCommand(_ => ShowStatistics());
 
-            // Загрузка данных при инициализации
-            // Важно дождаться завершения асинхронной операции перед продолжением
-            LoadDataAsync().ConfigureAwait(false);
+            // Инициализируем данные асинхронно через async void, так как это событие UI
+            _ = InitializeAsync();
+        }
+
+        private async Task InitializeAsync()
+        {
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Ошибка при инициализации данных: {ex.Message}";
+            }
+        }
+
+        private bool CanEditOrDelete(object? parameter)
+        {
+            return SelectedScheduleEntry != null;
         }
 
         private async Task LoadDataAsync()
         {
             try
             {
-                ScheduleEntries = new ObservableCollection<ScheduleEntry>(await _scheduleService.GetAllScheduleEntriesAsync());
+                // Загрузка расписания и других данных
+                ScheduleEntries = new ObservableCollection<ScheduleEntry>(
+                    await _scheduleService.GetScheduleAsync(DateTime.MinValue, DateTime.MaxValue));
                 FilteredScheduleEntries = new ObservableCollection<ScheduleEntry>(ScheduleEntries);
-                Teachers = new ObservableCollection<Teacher>(await _teacherService.GetAllTeachersAsync());
-                Groups = new ObservableCollection<Group>(await _groupService.GetAllGroupsAsync());
-                Auditoriums = new ObservableCollection<Auditorium>(await _auditoriumService.GetAllAuditoriumsAsync());
+                
+                var teachers = await _teacherService.GetAllTeachersAsync();
+                Teachers = new ObservableCollection<Teacher>(teachers);
+                
+                var groups = await _groupService.GetAllGroupsAsync();
+                Groups = new ObservableCollection<Group>(groups);
+                
+                var auditoriums = await _auditoriumService.GetAllAuditoriumsAsync();
+                Auditoriums = new ObservableCollection<Auditorium>(auditoriums);
             }
             catch (Exception ex)
             {
@@ -274,7 +298,7 @@ namespace ScheduleCreate.ViewModels
             ApplyFilters();
         }
 
-        private void AddScheduleEntry(object parameter)
+        private void AddScheduleEntry(object? parameter)
         {
             var viewModel = new ScheduleEntryViewModel(_scheduleService, _teacherService, _groupService, _auditoriumService);
             var window = new ScheduleEntryWindow(viewModel)
@@ -285,7 +309,7 @@ namespace ScheduleCreate.ViewModels
             window.ShowDialog();
         }
 
-        private void EditScheduleEntry(object parameter)
+        private void EditScheduleEntry(object? parameter)
         {
             if (SelectedScheduleEntry != null)
             {
@@ -316,7 +340,7 @@ namespace ScheduleCreate.ViewModels
             }
         }
 
-        private void ManageTeachers()
+        private async Task ManageTeachers()
         {
             try
             {
@@ -327,7 +351,7 @@ namespace ScheduleCreate.ViewModels
                 };
 
                 window.ShowDialog();
-                LoadDataAsync();
+                await LoadDataAsync();
             }
             catch (Exception ex)
             {
@@ -335,7 +359,7 @@ namespace ScheduleCreate.ViewModels
             }
         }
 
-        private void ManageGroups()
+        private async Task ManageGroups()
         {
             try
             {
@@ -346,7 +370,7 @@ namespace ScheduleCreate.ViewModels
                 };
 
                 window.ShowDialog();
-                LoadDataAsync();
+                await LoadDataAsync();
             }
             catch (Exception ex)
             {
@@ -354,7 +378,7 @@ namespace ScheduleCreate.ViewModels
             }
         }
 
-        private void ManageAuditoriums()
+        private async Task ManageAuditoriums()
         {
             try
             {
@@ -365,7 +389,7 @@ namespace ScheduleCreate.ViewModels
                 };
                 
                 window.ShowDialog();
-                LoadDataAsync();
+                await LoadDataAsync();
             }
             catch (Exception ex)
             {
@@ -456,4 +480,4 @@ namespace ScheduleCreate.ViewModels
             }
         }
     }
-} 
+}

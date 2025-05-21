@@ -73,8 +73,11 @@ namespace ScheduleCreate.ViewModels
                 {
                     await _auditoriumService.AddAuditoriumAsync(_auditorium);
                 }
-                _window.DialogResult = true;
-                _window.Close();
+                if (_window != null)
+                {
+                    _window.DialogResult = true;
+                    _window.Close();
+                }
             }
             catch (Exception ex)
             {
@@ -90,8 +93,11 @@ namespace ScheduleCreate.ViewModels
 
         private void Cancel()
         {
-            _window.DialogResult = false;
-            _window.Close();
+            if (_window != null)
+            {
+                _window.DialogResult = false;
+                _window.Close();
+            }
         }
     }
-} 
+}
